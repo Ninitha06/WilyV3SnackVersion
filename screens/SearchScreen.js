@@ -46,7 +46,22 @@ export default class SearchScreen extends Component {
 
     const { allTransactions, lastVisibleTransaction } = this.state;
 
-    if (enteredText[0] == "B") {
+     // Use !text or enteredText[0] === 'undefined'
+    if (!text) {
+      var bookRef = await db
+        .collection('transactions')
+        .startAfter(this.state.lastVisibleTransaction)
+        .limit(10)
+        .get();
+
+      bookRef.docs.map((doc) => {
+        this.setState({
+          allTransactions: [...this.state.allTransactions, doc.data()],
+          lastVisibleTransaction: doc,
+        });
+      });
+    }
+    else if (enteredText[0] == "B") {
       db.collection("transactions")
         .where("book_id", "==", text)
         .startAfter(lastVisibleTransaction)
